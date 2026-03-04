@@ -1,0 +1,20 @@
+header {
+  width: 100%;
+}
+
+.navbar {
+  width: 100%;
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+header .menus a {
+  cursor: pointer;
+  color: #fff;
+  text-decoration: none;
+}
