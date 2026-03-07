@@ -1,13 +1,26 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
+import { useAccountStore } from '../stores/account.tsx';
+import { logout } from '../services/accountService.ts';
 
 const Header = () => {
-  const isLoggedIn = false;
-
-  const logoutAccount = () => {
-    window.alert('준비 중입니다.');
+  // 계정 스토어
+  const { state, setState } = useAccountStore();
+  
+  // 라우터 객체
+  const navigate = useNavigate();
+  
+  // 로그아웃 핸들러
+  const logoutAccount = async () => {
+    const res = await logout();
+    if (res.status === 200) {
+      setState({
+        ...state,
+        loggedIn: false,
+      });
+      navigate('/');
+    }
   };
-
   return (
     <header>
       <div className="navbar navbar-dark bg-dark text-white shadow-sm">
@@ -16,7 +29,7 @@ const Header = () => {
             <strong>Gallery</strong>
           </Link>
           <div className="menus d-flex gap-3">
-            {!isLoggedIn ? (
+            {!state.loggedIn ? (
               <>
                 <Link to="/login">로그인</Link>
                 <Link to="/join">회원가입</Link>
