@@ -1,0 +1,8 @@
+.order-detail > .container table th,
+.order-detail > .container table td {
+  padding: 15px 25px;
+}
+
+.order-detail > .container table th {
+  background: #f7f7f7;
+}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
-type AccountState = {
+export type AccountState = {
   id?: string;
   name?: string;
   checked: boolean;
@@ -10,7 +10,7 @@ type AccountState = {
 
 type AccountContextValue = {
   state: AccountState;
-  setState: (next: AccountState) => void;
+  setState: Dispatch<SetStateAction<AccountState>>;
 };
 
 const AccountContext = createContext<AccountContextValue | null>(null);

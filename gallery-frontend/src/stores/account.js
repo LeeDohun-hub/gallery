@@ -3,7 +3,8 @@ import {defineStore} from 'pinia'
 export const useAccountStore = defineStore("account", {
     state: () => ({
         checked: false,
-        loggedIn: null
+        loggedIn: false,
+        accessToken: "", // ①
     }),
     actions: {
         setChecked(val) {
@@ -12,6 +13,8 @@ export const useAccountStore = defineStore("account", {
         setLoggedIn(val) {
             this.loggedIn = val;
         },
+        setAccessToken(val) { // ②
+            this.accessToken = val;
+        },
     },
 });
-

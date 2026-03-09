@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import './Header.css';
-import { useAccountStore } from '../stores/account.tsx';
 import { logout } from '../services/accountService.ts';
+import { useAccountStore } from '../stores/account.tsx';
+import { setAccessToken } from '../libs/httpRequester.ts';
+import { getStatus } from '../utils/http.ts';
+import './Header.css';
 
 const Header = () => {
   // 계정 스토어
@@ -13,11 +15,12 @@ const Header = () => {
   // 로그아웃 핸들러
   const logoutAccount = async () => {
     const res = await logout();
-    if (res.status === 200) {
-      setState({
-        ...state,
+    if (getStatus(res) === 200) {
+      setAccessToken(null);
+      setState((prev) => ({
+        ...prev,
         loggedIn: false,
-      });
+      }));
       navigate('/');
     }
   };
@@ -36,7 +39,9 @@ const Header = () => {
               </>
             ) : (
               <>
-                <a onClick={logoutAccount}>로그아웃</a>
+                <button type="button" className="btn btn-link p-0" onClick={logoutAccount}>
+                  로그아웃
+                </button>
                 <Link to="/orders">주문 내역</Link>
                 <Link to="/cart">장바구니</Link>
               </>

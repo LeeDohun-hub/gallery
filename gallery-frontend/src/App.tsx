@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { useAccountStore } from './stores/account.tsx';
 import { check } from './services/accountService.ts';
+import { getData, getStatus } from './utils/http.ts';
 
 function App() {
   const { state, setState } = useAccountStore();
@@ -12,21 +13,15 @@ function App() {
 
   const checkAccount = useCallback(async () => {
     const res = await check();
+    const status = getStatus(res);
+    const data = getData<boolean>(res);
 
-    if (res.status === 200) {
-      setState({
-        ...state,
-        checked: true,
-        loggedIn: res.data === true,
-      });
-    } else {
-      setState({
-        ...state,
-        checked: false,
-        loggedIn: false,
-      });
-    }
-  }, [state, setState]);
+    setState((prev) => ({
+      ...prev,
+      checked: true,
+      loggedIn: status === 200 && data === true,
+    }));
+  }, [setState]);
 
   useEffect(() => {
     void checkAccount();

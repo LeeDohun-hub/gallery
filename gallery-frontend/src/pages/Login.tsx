@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { setAccessToken } from '../libs/httpRequester.ts';
 import { login } from '../services/accountService.ts';
+import { useAccountStore } from '../stores/account.tsx';
+import { getData, getStatus } from '../utils/http.ts';
 
 type LoginForm = {
   loginId: string;
@@ -14,6 +17,9 @@ export default function Login() {
     loginPw: '',
   });
 
+  const loginIdRef = useRef<HTMLInputElement | null>(null);
+  const loginPwRef = useRef<HTMLInputElement | null>(null);
+  const { setState } = useAccountStore();
   const navigate = useNavigate();
 
   const handleChange =
@@ -28,12 +34,32 @@ export default function Login() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const res = await login(form);
+    if (!form.loginId.trim()) {
+      window.alert('이메일을 입력해주세요.');
+      loginIdRef.current?.focus();
+      return;
+    }
 
-    switch (res?.status) {
-      case 200:
+    if (!form.loginPw.trim()) {
+      window.alert('패스워드를 입력해주세요.');
+      loginPwRef.current?.focus();
+      return;
+    }
+
+    const res = await login(form);
+    const status = getStatus(res);
+
+    switch (status) {
+      case 200: {
+        const data = getData<string>(res);
+        if (typeof data === 'string') setAccessToken(data);
+        setState((prev) => ({
+          ...prev,
+          loggedIn: true,
+        }));
         navigate('/');
         break;
+      }
       case 404:
         window.alert('입력하신 정보와 일치하는 회원이 없습니다.');
         break;
@@ -55,6 +81,7 @@ export default function Login() {
 
           <div className="form-floating">
             <input
+              ref={loginIdRef}
               type="email"
               className="form-control"
               id="loginId"
@@ -67,6 +94,7 @@ export default function Login() {
 
           <div className="form-floating">
             <input
+              ref={loginPwRef}
               type="password"
               className="form-control"
               id="loginPw"

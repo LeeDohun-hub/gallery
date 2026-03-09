@@ -2,6 +2,7 @@
 import {addItem} from "@/services/cartService";
 import {useRouter} from "vue-router";
 import {computed} from "vue";
+import {useAccountStore} from "@/stores/account"; // ①
 
 const props = defineProps({
   item: {
@@ -19,10 +20,21 @@ const computedItemDiscountPrice = computed(() => {
 })
 
 // 라우터 객체
-const router = useRouter(); // ①
+const router = useRouter();
+
+// 계정 스토어
+const accountStore = useAccountStore(); // ②
 
 // 장바구니에 상품 담기
-const put = async () => { // ②
+const put = async () => { // ③
+  if (!accountStore.loggedIn) {
+    if (window.confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?")) {
+      await router.push("/login");
+    }
+
+    return;
+  }
+
   const res = await addItem(props.item.id);
 
   if (res.status === 200 && window.confirm('장바구니에 상품을 담았습니다. 장바구니로 이동하시겠습니까?')) {
@@ -32,7 +44,7 @@ const put = async () => { // ②
 </script>
 
 <template>
-  <div class="card shadow-sm">
+  <div class="card shadow-sm"> <!-- ④ -->
     <!-- 상품 사진 출력 -->
     <span class="img" :style="{backgroundImage: `url(${props.item.imgPath})`}"
           :aria-label="`상품 사진(${props.item.name})`"></span>
